@@ -9,7 +9,7 @@ SELECT * FROM deals_taken;
 
 -- DATA CLEANING (DC)
 
--- DC 1. CHANGING THE NAME FORMAT
+-- DC 1. Changing the name format
 
 ALTER TABLE customer_details
 RENAME COLUMN `Birth Year` TO `birth_year`; 
@@ -66,7 +66,7 @@ RENAME COLUMN `Website Visits`TO `website_visits`;
 
 
 
--- DC 2. TRIMMING COLUMNS TO REMOVE ALL STARTING AND TRAILING SPACES
+-- DC 2. Trimming columns to remove all starting and trailing spaces
 
 UPDATE `customer_details` SET `ID` = TRIM(`ID`);                           
 UPDATE `customer_details` SET `birth_year` = TRIM(`birth_year`);
@@ -98,7 +98,7 @@ UPDATE `campaign_results` SET `deals_store` = TRIM(`deals_store`);
 UPDATE `campaign_results` SET `website_visits` = TRIM(`website_visits`);       
 
 
--- DC 3. VIEWING AND REMOVING DATA WHERE AGE IS > 100
+-- DC 3. Viewing and removing data where the customer's age is > 100
 
 SELECT ID, (YEAR(CURRENT_DATE) - birth_year) AS age
 FROM customer_details
@@ -125,7 +125,9 @@ SELECT *
 FROM deals_taken
 WHERE ID IN (1150, 7829, 11004);
 
--- DC 4. DROPPING COLUMNS THAT DO NOT ADD ANY VALUE
+
+
+-- DC 4. Dropping columns that do not add any value
 
 ALTER TABLE campaign_results
 DROP COLUMN Complain; -- blank column
@@ -140,15 +142,15 @@ ALTER TABLE campaign_results
 DROP COLUMN `join_month`; -- duplicate column
                       
 
--- DC 5. To rearrange the Results_Campaign columns from 1st to 5th
+-- DC 5. To rearrange the Results_Campaign columns in order from 1st to 5th
 
 ALTER TABLE campaign_results
 MODIFY COLUMN Results_Campaign1 TEXT AFTER ID; -- column moves to the 2nd place
 
 ALTER TABLE campaign_results
-MODIFY COLUMN Results_Campaign2 TEXT AFTER Results_Campaign1;
+MODIFY COLUMN Results_Campaign2 TEXT AFTER Results_Campaign1; -- the columns are in order
 
--- DC 6. Now changing False to 0 and True to 1.
+-- DC 6. The entries in the campaign_results table are 'True' or 'False', changing the data in the campaign_results table from false to 0 and true to 1.
 
 UPDATE campaign_results
 SET Results_Campaign1 = (CASE WHEN Results_Campaign1 = 'TRUE' THEN 1
@@ -175,7 +177,7 @@ SET Results_Campaign5 = (CASE WHEN Results_Campaign5 = 'TRUE' THEN 1
                            WHEN Results_Campaign5 = 'FALSE' THEN 0
                            END);
 
--- DC 7. changing the datatype of the results_campaign fileds to boolean
+-- DC 7. changing the datatype of the results_campaign fields to tinyint
 
 ALTER TABLE campaign_results    
 MODIFY Results_Campaign1 TINYINT;  
@@ -191,13 +193,6 @@ MODIFY Results_Campaign4 TINYINT;
 
 ALTER TABLE campaign_results    
 MODIFY Results_Campaign5 TINYINT;  -- The data type was text before these queries were executed
-
-
-
-SELECT * FROM customer_details;
-SELECT * FROM campaign_results;
-SELECT * FROM deals_taken;
-
 
 
 -- Analyzing the data (DA)
