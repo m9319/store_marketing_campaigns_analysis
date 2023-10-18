@@ -66,7 +66,6 @@ RENAME COLUMN `Website Visits`TO `website_visits`;
 
 
 
-
 -- DC 2. TRIMMING COLUMNS TO REMOVE ALL STARTING AND TRAILING SPACES
 
 UPDATE `customer_details` SET `ID` = TRIM(`ID`);                           
@@ -99,28 +98,14 @@ UPDATE `campaign_results` SET `deals_store` = TRIM(`deals_store`);
 UPDATE `campaign_results` SET `website_visits` = TRIM(`website_visits`);       
 
 
-
-
--- TO VIEW THE DATATYPES OF ALL THE FIELDS IN THE TABLE
-
-SHOW FIELDS FROM customer_details;
-
 -- DC 3. VIEWING AND REMOVING DATA WHERE AGE IS > 100
 
 SELECT ID, (YEAR(CURRENT_DATE) - birth_year) AS age
 FROM customer_details
-ORDER BY age DESC;
-
-SELECT *
-FROM customer_details
-	INNER JOIN campaign_results
-		ON customer_details.ID = campaign_results.ID
-	INNER JOIN deals_taken
-		ON campaign_results.ID = deals_taken.ID
-WHERE (YEAR(CURRENT_DATE) - birth_year) > 100;
+ORDER BY age DESC; -- There are 3 customers with age above 100 years, cust ID - 1150, 7829, 11004.
 
 DELETE FROM customer_details
-WHERE (YEAR(CURRENT_DATE) - birth_year) > 100;
+WHERE ID IN (1150, 7829, 11004);
 
 SELECT *
 FROM customer_details
@@ -143,16 +128,16 @@ WHERE ID IN (1150, 7829, 11004);
 -- DC 4. DROPPING COLUMNS THAT DO NOT ADD ANY VALUE
 
 ALTER TABLE campaign_results
-DROP COLUMN Complain;
+DROP COLUMN Complain; -- blank column
 
 ALTER TABLE customer_details
-DROP COLUMN `last_purchase`;
+DROP COLUMN `last_purchase`; -- no relevant data for any record
 
 ALTER TABLE campaign_results
-DROP COLUMN `join_year`;                           
+DROP COLUMN `join_year`; -- duplicate column                          
                            
 ALTER TABLE campaign_results
-DROP COLUMN `join_month`;  
+DROP COLUMN `join_month`; -- duplicate column
                       
 
 -- DC 5. To rearrange the Results_Campaign columns from 1st to 5th
@@ -213,6 +198,8 @@ SELECT * FROM customer_details;
 SELECT * FROM campaign_results;
 SELECT * FROM deals_taken;
 
+
+
 -- Analyzing the data (DA)
 
 
@@ -226,7 +213,16 @@ ORDER BY num_of_customers DESC;
 -- O/P - Graduation - 1126, PhD - 483, Master - 369, 2n Cycle - 201, Basic - 54
 
 
--- O/P - Married - 864, Together - 580, Single - 480, Divorced - 232, Widow - 77, Alone - 3, YOLO - 2, Absurd - 2
+
+-- DA 2. COUNT OF CUSTOMERS BY MARITAL STATUS
+
+SELECT DISTINCT marital_status, COUNT(*) AS num_of_customers
+FROM customer_details
+GROUP BY marital_status
+ORDER BY num_of_customers DESC;
+
+
+-- O/P A) - Married - 864, Together - 580, Single - 480, Divorced - 232, Widow - 77, Alone - 3, YOLO - 2, Absurd - 2
 
 -- Since alone is similiar to Single, the status for alone can be chnaged to single, YOLO, absurd can be removed since
 -- just 4 records have YOLO as the marital_status. 
@@ -240,16 +236,16 @@ FROM customer_details
 WHERE marital_status = 'YOLO'
 	OR marital_status = 'Absurd';
 
--- COUNT OF CUSTOMERS AS PER MARITAL STATUS
+-- THEREFORE, THE COUNT OF CUSTOMERS AS PER MARITAL STATUS IS:
 
 SELECT DISTINCT marital_status, COUNT(*) AS num_of_customers
 FROM customer_details
 GROUP BY marital_status
 ORDER BY num_of_customers DESC;
 
--- O/P - Married - 864, Together - 580, Single - 483, Divorced - 232, Widow - 77
+-- O/P B) - Married - 864, Together - 580, Single - 483, Divorced - 232, Widow - 77
 
--- CAMPAIGN SUCCESS RATES
+-- DA 3. CAMPAIGN SUCCESS RATES
 
 WITH CTE AS(
 
@@ -272,10 +268,10 @@ SELECT
     success_campaign4 / campaign_total AS success_rate_campaign4,
     success_campaign5 / campaign_total AS success_rate_campaign5
 FROM 
-	CTE;
+	CTE; -- success rates for campaign1 - 0.0644, campaign2 - 0.0134, campaign3 - 0.0729, campaign4 - 0.0747, campaign5 - 0.0724, campaign4 was the most successful of all
 
 
--- INCOME TO EXPENSE RATIO FOR CUSTOMERS
+-- DA 4. INCOME TO EXPENSE RATIO FOR CUSTOMERS
 
 SELECT
     cd.ID AS customer_ID,
@@ -290,9 +286,9 @@ GROUP BY 1,2
 ORDER BY spend_pc DESC;
 
 
--- CUSTOMERS WHO HAVE NOT USED ANY DEAL
+-- DA 5. CUSTOMERS WHO DID NOT USE ANY DEAL
 	
-WITH more_than_2 AS (
+WITH zero_deals AS (
 
 	SELECT
 		customer_details.ID AS cust_ID,
@@ -307,25 +303,13 @@ WITH more_than_2 AS (
     SELECT 
 		cust_ID,
         num_of_deals_taken
-	FROM more_than_2
-    WHERE num_of_deals_taken = 0;
+	FROM zero_deals
+    WHERE num_of_deals_taken = 0; -- o/p cust IDs - 3955, 5555, 11110, 11181 did not use any deals
 
 
 SELECT * FROM customer_details;
 SELECT * FROM campaign_results;
 SELECT * FROM deals_taken;
-
-
-SELECT CURRENT_DATE - INTERVAL FLOOR(RAND() * 28) DAY;
-
-
-select date_format(
-    from_unixtime(
-         rand() * 
-            (unix_timestamp('2012-11-13 16:00:00') - unix_timestamp('2014-12-31 23:00:00')) + 
-             unix_timestamp('2014-12-31 23:00:00')
-                  ), '%Y-%m-%d %H:%i:%s') as datum_roden
-;
 
 
 
