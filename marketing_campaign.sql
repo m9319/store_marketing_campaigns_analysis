@@ -198,7 +198,7 @@ MODIFY Results_Campaign5 TINYINT;  -- The data type was text before these querie
 -- Analyzing the data (DA)
 
 
--- DA 1. COUNT OF CUSTOMERS BY EDUCATION
+-- DA 1. Count of customers by Education 
 
 SELECT DISTINCT Education, COUNT(*) AS num_of_customers
 FROM customer_details
@@ -209,7 +209,7 @@ ORDER BY num_of_customers DESC;
 
 
 
--- DA 2. COUNT OF CUSTOMERS BY MARITAL STATUS
+-- DA 2. Count of customers by marital status
 
 SELECT DISTINCT marital_status, COUNT(*) AS num_of_customers
 FROM customer_details
@@ -231,7 +231,7 @@ FROM customer_details
 WHERE marital_status = 'YOLO'
 	OR marital_status = 'Absurd';
 
--- THEREFORE, THE COUNT OF CUSTOMERS AS PER MARITAL STATUS IS:
+-- Therefore, the count of customers as per marital status is:
 
 SELECT DISTINCT marital_status, COUNT(*) AS num_of_customers
 FROM customer_details
@@ -240,7 +240,9 @@ ORDER BY num_of_customers DESC;
 
 -- O/P B) - Married - 864, Together - 580, Single - 483, Divorced - 232, Widow - 77
 
--- DA 3. CAMPAIGN SUCCESS RATES
+
+
+-- DA 3. Campaign success rates
 
 WITH CTE AS(
 
@@ -266,7 +268,7 @@ FROM
 	CTE; -- success rates for campaign1 - 0.0644, campaign2 - 0.0134, campaign3 - 0.0729, campaign4 - 0.0747, campaign5 - 0.0724, campaign4 was the most successful of all
 
 
--- DA 4. INCOME TO EXPENSE RATIO FOR CUSTOMERS
+-- DA 4. Income to expense ratio for customers
 
 SELECT
     cd.ID AS customer_ID,
@@ -281,7 +283,7 @@ GROUP BY 1,2
 ORDER BY spend_pc DESC;
 
 
--- DA 5. CUSTOMERS WHO DID NOT USE ANY DEAL
+-- DA 5. Customers who did not use any deal
 	
 WITH zero_deals AS (
 
@@ -300,16 +302,6 @@ WITH zero_deals AS (
         num_of_deals_taken
 	FROM zero_deals
     WHERE num_of_deals_taken = 0; -- o/p cust IDs - 3955, 5555, 11110, 11181 did not use any deals
-
-
-SELECT * FROM customer_details;
-SELECT * FROM campaign_results;
-SELECT * FROM deals_taken;
-
-
-
-
-
 
 
 
