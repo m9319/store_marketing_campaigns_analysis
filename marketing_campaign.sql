@@ -9,7 +9,7 @@ SELECT * FROM deals_taken;
 
 -- DATA CLEANING (DC)
 
--- DC 1. Changing the name format
+-- DC 1. Changing the name format of columns
 
 ALTER TABLE customer_details
 RENAME COLUMN `Birth Year` TO `birth_year`; 
@@ -142,7 +142,7 @@ ALTER TABLE campaign_results
 DROP COLUMN `join_month`; -- duplicate column
                       
 
--- DC 5. To rearrange the Results_Campaign columns in order from 1st to 5th
+-- DC 5. Rearranging the Results_Campaign columns in order from 1st to 5th (The column order was 2, 1, 3, 4, 5)
 
 ALTER TABLE campaign_results
 MODIFY COLUMN Results_Campaign1 TEXT AFTER ID; -- column moves to the 2nd place
@@ -155,7 +155,7 @@ MODIFY COLUMN Results_Campaign2 TEXT AFTER Results_Campaign1; -- the columns are
 UPDATE campaign_results
 SET Results_Campaign1 = (CASE WHEN Results_Campaign1 = 'TRUE' THEN 1
                            WHEN Results_Campaign1 = 'FALSE' THEN 0
-                           END); -- works!
+                           END);
                            
 UPDATE campaign_results
 SET Results_Campaign2 = (CASE WHEN Results_Campaign2 = 'TRUE' THEN 1
@@ -177,7 +177,7 @@ SET Results_Campaign5 = (CASE WHEN Results_Campaign5 = 'TRUE' THEN 1
                            WHEN Results_Campaign5 = 'FALSE' THEN 0
                            END);
 
--- DC 7. changing the datatype of the results_campaign fields to tinyint
+-- DC 7. changing the datatype of the results_campaign fields to tinyint ( The data type was text initially.)
 
 ALTER TABLE campaign_results    
 MODIFY Results_Campaign1 TINYINT;  
@@ -192,7 +192,7 @@ ALTER TABLE campaign_results
 MODIFY Results_Campaign4 TINYINT;  
 
 ALTER TABLE campaign_results    
-MODIFY Results_Campaign5 TINYINT;  -- The data type was text before these queries were executed
+MODIFY Results_Campaign5 TINYINT;  
 
 
 -- Analyzing the data (DA)
@@ -208,7 +208,6 @@ ORDER BY num_of_customers DESC;
 -- O/P - Graduation - 1126, PhD - 483, Master - 369, 2n Cycle - 201, Basic - 54
 
 
-
 -- DA 2. Count of customers by marital status
 
 SELECT DISTINCT marital_status, COUNT(*) AS num_of_customers
@@ -219,8 +218,9 @@ ORDER BY num_of_customers DESC;
 
 -- O/P A) - Married - 864, Together - 580, Single - 480, Divorced - 232, Widow - 77, Alone - 3, YOLO - 2, Absurd - 2
 
--- Since alone is similiar to Single, the status for alone can be chnaged to single, YOLO, absurd can be removed since
--- just 4 records have YOLO as the marital_status. 
+-- Other values in marital status columns:
+-- i) Alone - Alone is similar to 'Single' and hence would be included in the 'Single' type.
+-- ii) YOLO, absurd  - These would be removed.
 
 UPDATE customer_details
 SET marital_status = 'Single'
@@ -244,19 +244,19 @@ ORDER BY num_of_customers DESC;
 
 -- DA 3. Campaign success rates
 
-WITH CTE AS(
+WITH CTE AS (
 
 SELECT
 
-	SUM(CASE WHEN Results_Campaign1 = 1 THEN 1 ELSE 0 END) AS success_campaign1,
+    SUM(CASE WHEN Results_Campaign1 = 1 THEN 1 ELSE 0 END) AS success_campaign1,
     SUM(CASE WHEN Results_Campaign2 = 1 THEN 1 ELSE 0 END) AS success_campaign2,
     SUM(CASE WHEN Results_Campaign3 = 1 THEN 1 ELSE 0 END) AS success_campaign3,
     SUM(CASE WHEN Results_Campaign4 = 1 THEN 1 ELSE 0 END) AS success_campaign4,
     SUM(CASE WHEN Results_Campaign5 = 1 THEN 1 ELSE 0 END) AS success_campaign5,
-    -- SUM(Results_Campaign1 + Results_Campaign2 + Results_Campaign3 + Results_Campaign4 + Results_Campaign5) AS campaign_total
-	COUNT(*) AS campaign_total
+    COUNT(*) AS campaign_total
 FROM
-    campaign_results)
+    campaign_results 
+	     )
 
 SELECT 
 	success_campaign1 / campaign_total AS success_rate_campaign1,
@@ -268,14 +268,13 @@ FROM
 	CTE; -- success rates for campaign1 - 0.0644, campaign2 - 0.0134, campaign3 - 0.0729, campaign4 - 0.0747, campaign5 - 0.0724, campaign4 was the most successful of all
 
 
--- DA 4. Income to expense ratio for customers
+-- DA 4. Income to expense ratio for all customers
 
 SELECT
     cd.ID AS customer_ID,
-    -- cd.Education,
     cd.Income,
     SUM(cd.Amount_Wines + cd.Amount_Fruit + cd.Amount_Meat + cd.Amount_Fish + cd.Amount_Sweets + cd.Amount_Gold) AS amt_spent,
-	((SUM(cd.Amount_Wines + cd.Amount_Fruit + cd.Amount_Meat + cd.Amount_Fish + cd.Amount_Sweets + cd.Amount_Gold)) / Income) * 100 AS spend_pc
+    ((SUM(cd.Amount_Wines + cd.Amount_Fruit + cd.Amount_Meat + cd.Amount_Fish + cd.Amount_Sweets + cd.Amount_Gold)) / Income) * 100 AS spend_pc
 
 FROM
     customer_details cd
@@ -295,15 +294,13 @@ WITH zero_deals AS (
 			ON customer_details.ID = deals_taken.ID
 	GROUP BY customer_details.ID
 	ORDER BY num_of_deals_taken DESC
-    )
+		   )
     
     SELECT 
-		cust_ID,
+	cust_ID,
         num_of_deals_taken
-	FROM zero_deals
-    WHERE num_of_deals_taken = 0; -- o/p cust IDs - 3955, 5555, 11110, 11181 did not use any deals
-
-
+    FROM zero_deals
+    WHERE num_of_deals_taken = 0; -- O/P cust IDs - 3955, 5555, 11110, 11181 did not use any deals
 
 
 
