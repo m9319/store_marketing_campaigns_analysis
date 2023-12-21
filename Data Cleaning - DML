@@ -1,0 +1,109 @@
+USE marketing_campaign;
+
+SELECT * FROM customer_details;
+
+SELECT * FROM campaign_results;
+
+SELECT * FROM deals_taken;
+
+
+-- DC DML 1. Trimming columns to remove all starting and trailing spaces
+
+UPDATE `customer_details` SET `ID` = TRIM(`ID`);                           
+UPDATE `customer_details` SET `birth_year` = TRIM(`birth_year`);
+UPDATE `customer_details` SET `Education` = TRIM(`Education`);                           
+UPDATE `customer_details` SET `marital_status` = TRIM(`marital_status`);                           
+UPDATE `customer_details` SET `Income` = TRIM(`Income`);                           
+UPDATE `customer_details` SET `kids_count` = TRIM(`kids_count`);                           
+UPDATE `customer_details` SET `teens_count` = TRIM(`teens_count`);                           
+UPDATE `customer_details` SET `last_purchase` = TRIM(`last_purchase`);                           
+UPDATE `customer_details` SET `Amount-Wines` = TRIM(`amount_wines`);                           
+UPDATE `customer_details` SET `Amount-Fruits` = TRIM(`amount_fruits`);                           
+UPDATE `customer_details` SET `Amount-Meat` = TRIM(`amount_meat`);                           
+UPDATE `customer_details` SET `Amount-Fish` = TRIM(`amount_fish`);                           
+UPDATE `customer_details` SET `Amount-Sweets` = TRIM(`amount_sweets`);                           
+UPDATE `customer_details` SET `Amount-Gold` = TRIM(`amount_gold`);                                                                                
+UPDATE `customer_details` SET `join_year` = TRIM(`join_year`);                                                                                
+UPDATE `customer_details` SET `join_month` = TRIM(`join_month`);    
+
+UPDATE `campaign_results` SET `Results_Campaign3` = TRIM(`Results_Campaign3`);                         
+UPDATE `campaign_results` SET `Results_Campaign4` = TRIM(`Results_Campaign4`);                              
+UPDATE `campaign_results` SET `Results_Campaign5` = TRIM(`Results_Campaign5`);                              
+UPDATE `campaign_results` SET `Results_Campaign1` = TRIM(`Results_Campaign1`);                              
+UPDATE `campaign_results` SET `Results_Campaign2` = TRIM(`Results_Campaign2`);                              
+
+UPDATE `campaign_results` SET `deals_discounted` = TRIM(`deals_discounted`);       
+UPDATE `campaign_results` SET `deals_website` = TRIM(`deals_website`);       
+UPDATE `campaign_results` SET `deals_catalogue` = TRIM(`deals_catalogue`);       
+UPDATE `campaign_results` SET `deals_store` = TRIM(`deals_store`);       
+UPDATE `campaign_results` SET `website_visits` = TRIM(`website_visits`);       
+
+
+-- DC DML 2. Viewing and removing data where the customer's age is > 100
+
+SELECT ID, (YEAR(CURRENT_DATE) - birth_year) AS age
+FROM customer_details
+ORDER BY age DESC; -- There are 3 customers with age above 100 years, cust ID - 1150, 7829, 11004.
+
+DELETE FROM customer_details
+WHERE ID IN (1150, 7829, 11004);
+
+SELECT *
+FROM customer_details
+WHERE ID IN (1150, 7829, 11004);
+
+DELETE FROM campaign_results
+WHERE ID IN (1150, 7829, 11004);
+
+SELECT *
+FROM campaign_results
+WHERE ID IN (1150, 7829, 11004);
+
+DELETE FROM deals_taken
+WHERE ID IN (1150, 7829, 11004);
+
+SELECT *
+FROM deals_taken
+WHERE ID IN (1150, 7829, 11004);
+                      
+
+-- DC DML 3. The entries in the campaign_results table are 'True' or 'False', changing the data in the campaign_results table from false to 0 and true to 1.
+
+UPDATE campaign_results
+SET Results_Campaign1 = (CASE WHEN Results_Campaign1 = 'TRUE' THEN 1
+                              WHEN Results_Campaign1 = 'FALSE' THEN 0
+                         END);
+                           
+UPDATE campaign_results
+SET Results_Campaign2 = (CASE WHEN Results_Campaign2 = 'TRUE' THEN 1
+                              WHEN Results_Campaign2 = 'FALSE' THEN 0
+                         END);
+
+UPDATE campaign_results
+SET Results_Campaign3 = (CASE WHEN Results_Campaign3 = 'TRUE' THEN 1
+                              WHEN Results_Campaign3 = 'FALSE' THEN 0
+                         END);
+
+UPDATE campaign_results
+SET Results_Campaign4 = (CASE WHEN Results_Campaign4 = 'TRUE' THEN 1
+                              WHEN Results_Campaign4 = 'FALSE' THEN 0
+                         END);
+
+UPDATE campaign_results
+SET Results_Campaign5 = (CASE WHEN Results_Campaign5 = 'TRUE' THEN 1
+                              WHEN Results_Campaign5 = 'FALSE' THEN 0
+                         END);
+
+-- -- DC DML 4. There are some odd values in marital status columns:
+-- i) Alone - Alone is similar to 'Single' and hence would be included in the 'Single' type.
+-- ii) YOLO, absurd  - These would be removed.
+
+UPDATE customer_details
+SET marital_status = 'Single'
+WHERE marital_status = 'Alone';
+
+DELETE
+FROM customer_details
+WHERE marital_status = 'YOLO'
+	OR marital_status = 'Absurd';
+
