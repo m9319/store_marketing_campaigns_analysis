@@ -1,0 +1,111 @@
+USE marketing_campaign;
+
+SELECT * FROM customer_details;
+
+SELECT * FROM campaign_results;
+
+SELECT * FROM deals_taken;
+
+
+-- DATA CLEANING (DC) - DDL
+
+-- DC DDL 1. Changing the name format of columns
+
+ALTER TABLE customer_details
+RENAME COLUMN `Birth Year` TO `birth_year`; 
+
+ALTER TABLE customer_details
+RENAME COLUMN `Kids Count` TO `kids_count`;
+
+ALTER TABLE customer_details
+RENAME COLUMN `Teens Count` TO`teens_count`;
+
+ALTER TABLE customer_details
+RENAME COLUMN `Join Date` TO `join_date`;
+
+ALTER TABLE customer_details
+RENAME COLUMN `Last Purchase` TO `last_purchase`;
+
+ALTER TABLE customer_details
+RENAME COLUMN `Join Year` TO `join_year`;
+
+ALTER TABLE customer_details
+RENAME COLUMN `Join Month` TO `join_month`;
+
+
+ALTER TABLE campaign_results
+RENAME COLUMN `Results-Campaign3`TO `Results_Campaign3`;
+
+ALTER TABLE campaign_results
+RENAME COLUMN `Results-Campaign4`TO `Results_Campaign4`;
+
+ALTER TABLE campaign_results
+RENAME COLUMN `Results-Campaign5`TO `Results_Campaign5`;
+
+ALTER TABLE campaign_results
+RENAME COLUMN `Results-Campaign1`TO `Results_Campaign1`;
+
+ALTER TABLE campaign_results
+RENAME COLUMN `Results-Campaign2`TO `Results_Campaign2`;
+
+
+ALTER TABLE deals_taken
+RENAME COLUMN `Deals-Discounted`TO `deals_discounted`;
+
+ALTER TABLE deals_taken
+RENAME COLUMN `Deals-Website`TO `deals_website`;
+
+ALTER TABLE deals_taken
+RENAME COLUMN `Deals-Catalogue`TO `deals_catalogue`;
+
+ALTER TABLE deals_taken
+RENAME COLUMN `Deals-Store`TO `deals_store`;
+
+ALTER TABLE deals_taken
+RENAME COLUMN `Website Visits`TO `website_visits`;
+
+
+-- DC DDL 2. Dropping columns that do not add any value
+
+ALTER TABLE campaign_results
+DROP COLUMN Complain; -- blank column
+
+ALTER TABLE customer_details
+DROP COLUMN `last_purchase`; -- no relevant data for any record
+
+ALTER TABLE campaign_results
+DROP COLUMN `join_year`; -- duplicate column                          
+                           
+ALTER TABLE campaign_results
+DROP COLUMN `join_month`; -- duplicate column
+
+
+-- DC DDL 3. Rearranging the Results_Campaign columns in order from 1st to 5th (The column order was 2, 1, 3, 4, 5)
+
+ALTER TABLE campaign_results
+MODIFY COLUMN Results_Campaign1 TEXT AFTER ID; -- column moves to the 2nd place
+
+ALTER TABLE campaign_results
+MODIFY COLUMN Results_Campaign2 TEXT AFTER Results_Campaign1; -- the columns are in order
+
+
+-- DC DDL 4. Changing the datatype of the results_campaign fields to tinyint ( The data type was text initially.)
+
+ALTER TABLE campaign_results    
+MODIFY Results_Campaign1 TINYINT;  
+
+ALTER TABLE campaign_results    
+MODIFY Results_Campaign2 TINYINT;  
+
+ALTER TABLE campaign_results    
+MODIFY Results_Campaign3 TINYINT;  
+
+ALTER TABLE campaign_results    
+MODIFY Results_Campaign4 TINYINT;  
+
+ALTER TABLE campaign_results    
+MODIFY Results_Campaign5 TINYINT;  
+
+
+
+
