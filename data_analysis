@@ -1,0 +1,92 @@
+USE marketing_campaign;
+
+SELECT * FROM customer_details;
+
+SELECT * FROM campaign_results;
+
+SELECT * FROM deals_taken;
+
+
+-- DA 1. Count of customers by Education 
+
+SELECT DISTINCT Education, COUNT(*) AS num_of_customers
+FROM customer_details
+GROUP BY Education
+ORDER BY num_of_customers DESC;
+
+-- O/P - Graduation - 1126, PhD - 483, Master - 369, 2n Cycle - 201, Basic - 54
+
+
+-- DA 2. Count of customers by marital status
+
+SELECT DISTINCT marital_status, COUNT(*) AS num_of_customers
+FROM customer_details
+GROUP BY marital_status
+ORDER BY num_of_customers DESC;
+
+
+-- O/P - Married - 864, Together - 580, Single - 483, Divorced - 232, Widow - 77
+
+
+-- DA 3. Campaign success rates
+
+WITH CTE AS (
+
+SELECT
+
+    SUM(CASE WHEN Results_Campaign1 = 1 THEN 1 ELSE 0 END) AS success_campaign1,
+    SUM(CASE WHEN Results_Campaign2 = 1 THEN 1 ELSE 0 END) AS success_campaign2,
+    SUM(CASE WHEN Results_Campaign3 = 1 THEN 1 ELSE 0 END) AS success_campaign3,
+    SUM(CASE WHEN Results_Campaign4 = 1 THEN 1 ELSE 0 END) AS success_campaign4,
+    SUM(CASE WHEN Results_Campaign5 = 1 THEN 1 ELSE 0 END) AS success_campaign5,
+    COUNT(*) AS campaign_total
+FROM
+    campaign_results 
+	     )
+
+SELECT 
+  	success_campaign1 / campaign_total AS success_rate_campaign1,
+    success_campaign2 / campaign_total AS success_rate_campaign2,
+  	success_campaign3 / campaign_total AS success_rate_campaign3,
+    success_campaign4 / campaign_total AS success_rate_campaign4,
+    success_campaign5 / campaign_total AS success_rate_campaign5
+FROM 
+	CTE; -- success rates for campaign1 - 0.0644, campaign2 - 0.0134, campaign3 - 0.0729, campaign4 - 0.0747, campaign5 - 0.0724, campaign4 was the most successful of all
+
+
+-- DA 4. Income to expense ratio for all customers
+
+SELECT
+    cust.ID AS customer_ID,
+    cust.Income,
+    SUM(cust.Amount_Wines + cust.Amount_Fruit + cust.Amount_Meat + cust.Amount_Fish + cust.Amount_Sweets + cust.Amount_Gold) AS amt_spent,
+    ((SUM(cust.Amount_Wines + cust.Amount_Fruit + cust.Amount_Meat + cust.Amount_Fish + cust.Amount_Sweets + cust.Amount_Gold)) / Income) * 100 AS spend_pc
+
+FROM
+    customer_details AS cust
+GROUP BY 1,2
+ORDER BY spend_pc DESC;
+
+
+-- DA 5. Customers who did not use any deal
+	
+WITH zero_deals AS (
+
+	SELECT
+		customer_details.ID AS cust_ID,
+		SUM( deals_discounted + deals_website + deals_catalogue + deals_store ) AS num_of_deals_taken
+	FROM customer_details
+		LEFT JOIN deals_taken
+			ON customer_details.ID = deals_taken.ID
+	GROUP BY customer_details.ID
+	ORDER BY num_of_deals_taken DESC
+		   )
+    
+    SELECT 
+	cust_ID,
+        num_of_deals_taken
+    FROM zero_deals
+    WHERE num_of_deals_taken = 0; -- O/P cust IDs - 3955, 5555, 11110, 11181 did not use any deals
+
+
+
